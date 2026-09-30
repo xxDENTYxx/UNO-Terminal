@@ -1,14 +1,25 @@
-from constant import RAW_CARDS, COLORS, COLORS_PY, SPEC_COLOR, COLOR_RESET
+from constant import COLORS, COLORS_PY, SPEC_COLOR, COLOR_RESET
 from random import choice
 
 class Player:
     def __init__(self):
         self.hand = CardPul([])
-        self.is_blocked = False
         self.try_play = False
+        self.choose = None
+        self.card = None
 
     def can_play(self) -> bool:
         if not (self.is_blocked or self.try_play):
+            return True
+        return False
+
+    def is_win(self) -> bool:
+        if len(self.hand) == 0:
+            return True
+        return False
+
+    def is_blocked(self, other):
+        if other.card.value in ("block", "reverse", "again") and not other.try_play:
             return True
         return False
 
@@ -22,7 +33,7 @@ class Card:
         self.value = raw_card[0]
         self.color = raw_card[1]
 
-    def __eq__(self, other: Card) -> bool:
+    def __eq__(self, other) -> bool:
         if self.value == other.value and self.color == other.color:
             return True
         return False
@@ -30,7 +41,7 @@ class Card:
     def __str__(self) -> str:
         return f"{COLORS_PY[COLORS.index(self.color)]}({self.value} {self.color}){COLOR_RESET}"
 
-    def cpo(self, other: Card) -> bool:
+    def cpo(self, other) -> bool:
         if self.value == other.value or self.color == other.color or type(self) is WildCard:
             return True
         return False
@@ -66,21 +77,14 @@ class CardPul:
     def remove(self, card) -> None:
         self.__pul.remove(card)
 
-    def add(self, col: int, global_pul, show = False) -> None:
-        plus_pul = []
-        for i in range(col):
-            if len(global_pul) != 0:
-                x = choice(global_pul)
-                plus_pul.append(x)
-                global_pul.remove(x)
-        self.__pul.extend(plus_pul)
-        if len(plus_pul) < col:
-            print(f"Не удалось добавить карты ({col - len(plus_pul)}) т.к. колода закончилась")
-        if show and len(plus_pul) > 0:
-            print("Добавленные карты:", CardPul(plus_pul))
+    def add(self, card) -> None:
+        self.__pul.append(card)
+
+    def extend(self, pul) -> None:
+        self.__pul.extend(pul)
 
     @classmethod
-    def make_pul(raw_pul: list) -> CardPul:
+    def make_pul(raw_pul: list):
         pul = []
         for el in raw_pul:
             pul.append(Card(el))
