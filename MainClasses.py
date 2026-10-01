@@ -6,7 +6,7 @@ import random
 class RealPlayer(Player):        
     def make_choose(self):
         print("Ваш набор карт:\n" + self.hand)
-        print('Выберите карту для хода. Если таковой нет введите "+"')
+        print('Выберите карту для хода. Если подходящей нет введите "+"')
         player_choose = card_choose(input("Ваш выбор: "))
         self.choose = player_choose
         return self.choose
@@ -14,12 +14,23 @@ class RealPlayer(Player):
     def choose_card(self, ind: int) -> Card:
         return self.hand[ind]
 
-    def choose_color(self):
+    def choose_color(self, available_colors):
+        print("Доступные цвета:", ", ".join(available_colors))
         color = input("Выберите цвет: ")
-        while color not in COLORS:
+        while color not in available_colors:
             print("Некорректный ввод")
             color = input("Выберите цвет: ")
         self.card.color = color
+
+    def swipe(self, x):
+        pul = []
+        for el in self.hand:
+            if el.value == x:
+                pul.append(el)
+        self.hand, self.swipe_hand = pul, self.hand
+
+    def unswipe(self):
+        self.hand = self.swipe_hand
 
 class BotPlayer(Player):
     pass

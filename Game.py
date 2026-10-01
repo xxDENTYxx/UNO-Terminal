@@ -1,5 +1,6 @@
 from MainClasses import RealPlayer, BotPlayer, Deck
 from SubClasses import WildCard
+from constant import COLORS
 import random
 
 class Game:
@@ -10,13 +11,29 @@ class Game:
 
     def run(self):
         if self.deck.gm == "classic":
+
             card = random.choice(self.deck.all_cards)
             self.deck.all_cards.remove(card)
             print("Начальная карта:", card)
             while not self.game_is_over():
 
                 if not self.player.is_blocked(self.opponent): # Ход игрока
-                    self.player.choose = None
+
+                    if self.opponent.card.value in ("+2", "+4 wild card") and  not self.opponent.try_play and self.deck.dif == "normal":
+                        if self.opponent.card.value in self.player.hand.get_types():
+
+                            print("Будете ли вы отбивать карту противника?")
+                            self.player.choose = input("y (yes) / n (no): ")
+                            while self.player.choose not in "yn":
+                                self.player.choose = input("y (yes) / n (no): ")
+
+                            if self.player.choose == "y":
+                                self.player.swipe(self.opponent.card.value)
+                            else:
+                                print("Вы отказались отбивать карту противника.")
+                                self.deck.draw(self.deck.buff_sum, self.player.hand, show=True)
+
+
                     self.player_make_choose()
 
                     while not (self.player.card.cpo(self.deck.last_card) or self.player.choose in ("stop", "+", "")):
@@ -24,7 +41,7 @@ class Game:
                         self.player_make_choose()
 
                     if type(self.player.card) is WildCard:
-                        self.player.choose_color()
+                        self.player_select_color()
 
                     if self.player.card.value in ("+2", "+4 wild card"):
                         if self.deck.dif == "easy":
@@ -72,3 +89,9 @@ class Game:
             else:
                 self.player.card = self.player.hand[self.player.choose]
                 good_attempt = True
+
+    def player_select_color(self):
+        if self.deck.gm == "classic" or (self.deck.gm == "flip" and self.deck.side == "light"):
+            self.player.choose_color(COLORS[:4])
+        else:
+            self.player.choose_color(COLORS[4:])

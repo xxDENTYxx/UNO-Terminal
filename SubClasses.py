@@ -74,6 +74,12 @@ class CardPul:
             result += f" - {len(self.get_pul())} штука"
         return result
 
+    def get_types(self) -> list:
+        pul = []
+        for el in self.__pul:
+            pul.append(el.value)
+        return pul
+
     def remove(self, card) -> None:
         self.__pul.remove(card)
 
