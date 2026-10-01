@@ -1,12 +1,12 @@
 from constant import COLORS, COLORS_PY, SPEC_COLOR, COLOR_RESET
-from random import choice
+import random
 
 class Player:
     def __init__(self):
         self.hand = CardPul([])
         self.try_play = False
         self.choose = None
-        self.card = None
+        self.card = Card(None)
 
     def can_play(self) -> bool:
         if not (self.is_blocked or self.try_play):
@@ -27,6 +27,8 @@ class Card:
     def __new__(cls, raw_card):
         if cls is Card and raw_card in ("color choose", "+2 wild card", "+4 wild card", "wild draw color"):
             return super().__new__(WildCard)
+        elif cls is Card and raw_card is None:
+            return super().__new__(NoneCard)
         return super().__new__(cls)
     
     def __init__(self, raw_card):
@@ -54,6 +56,11 @@ class WildCard(Card):
     def __str__(self) -> str:
         return  f"{SPEC_COLOR}{self.value}{COLOR_RESET}"
 
+class NoneCard:
+    def __init__(self):
+        self.value = None
+        self.color = None
+
 class CardPul:
     def __init__(self, pul):
         self.__pul = pul
@@ -74,11 +81,29 @@ class CardPul:
             result += f" - {len(self.get_pul())} штука"
         return result
 
+    def randcard(self, x=-1):
+        return random.choice(self.__pul[:x])
+
+    def index(self, x):
+        return self.__pul.index(x)
+
     def get_types(self) -> list:
         pul = []
         for el in self.__pul:
             pul.append(el.value)
         return pul
+
+    def get_colors_count(self):
+        counts = {
+            "red": 0,
+            "yellow": 0,
+            "green": 0,
+            "blue": 0,
+            None: 0
+        }
+        for el in self.__pul:
+            counts[el.color] += 1
+        return counts
 
     def remove(self, card) -> None:
         self.__pul.remove(card)
@@ -89,8 +114,8 @@ class CardPul:
     def extend(self, pul) -> None:
         self.__pul.extend(pul)
 
-    @classmethod
-    def make_pul(raw_pul: list):
+    @staticmethod
+    def make_pul(raw_pul: tuple):
         pul = []
         for el in raw_pul:
             pul.append(Card(el))
