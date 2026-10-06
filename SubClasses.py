@@ -56,10 +56,10 @@ class WildCard(Card):
     def __str__(self) -> str:
         return  f"{SPEC_COLOR}{self.value}{COLOR_RESET}"
 
-class NoneCard:
-    def __init__(self):
-        self.value = None
-        self.color = None
+class NoneCard(Card):
+    def __init__(self, raw_card):
+        self.value = raw_card
+        self.color = raw_card
 
 class CardPul:
     def __init__(self, pul):
@@ -73,13 +73,19 @@ class CardPul:
         for el in self.__pul:
             x.append(str(el))
         result = ", ".join(x)
-        if 2 <= len(self.get_pul())%10 <=4 and len(self.get_pul())//10 != 1:
-            result += f" - {len(self.get_pul())} штуки"
-        elif 4 < len(self.get_pul())%10 <= 9 or len(self.get_pul())//10 == 1:
-            result += f" - {len(self.get_pul())} штук"
-        elif len(self.get_pul())%10 == 1 and len(self.get_pul()) != 1:
-            result += f" - {len(self.get_pul())} штука"
+        if 2 <= len(self)%10 <=4 and len(self)//10 != 1:
+            result += f" - {len(self)} штуки"
+        elif 4 < len(self)%10 <= 9 or len(self)//10 == 1:
+            result += f" - {len(self)} штук"
+        elif len(self)%10 == 1 and len(self) != 1:
+            result += f" - {len(self)} штука"
         return result
+
+    def __iter__(self):
+        return iter(self.__pul)
+
+    def __getitem__(self, key):
+        return self.__pul[key]
 
     def randcard(self, x=-1):
         return random.choice(self.__pul[:x])

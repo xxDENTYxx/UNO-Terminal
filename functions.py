@@ -15,7 +15,7 @@ def mi_bombo(x):
 def card_choose(x: str, pul) -> int:
     bad_try = False
     if mi_bombo(x):
-        card_choose(input("Ваш выбор: "))
+        card_choose(input("Ваш выбор: "), pul)
     if len(x.split()) > 1:
         if x.split()[1] in ("wild", "draw", "choose"):
             if Card(x) in pul:
@@ -23,10 +23,10 @@ def card_choose(x: str, pul) -> int:
             bad_try = True
         else:
             if Card((x.split()[0], x.split()[1])) in pul:
-                return Card((x.split()[0], x.split()[1]))
+                return pul.index(Card((x.split()[0], x.split()[1])))
             bad_try = True
     else:
-        if x not in "+":
+        if x not in ("+", "stop", ""):
             try:
                 x = int(x) - 1
                 pul[x]
@@ -38,7 +38,7 @@ def card_choose(x: str, pul) -> int:
             else:
                 return x
         else:
-            return False
+            return x
 
     if bad_try:
         print("Некорректный ввод")

@@ -1,5 +1,5 @@
 from MainClasses import RealPlayer, BotPlayer, Deck
-from SubClasses import WildCard, Card
+from SubClasses import WildCard, Card, NoneCard
 from constant import COLORS
 import random
 
@@ -15,7 +15,9 @@ class Game:
             card = self.deck.all_cards.randcard(-28)
             self.deck.all_cards.remove(card)
             self.deck.last_card = card
+            print("")
             print("Начальная карта:", card)
+            print("")
 
             self.deck.draw(self.deck.sosp, self.player.hand)
             self.deck.draw(self.deck.sosp, self.opponent.hand)
@@ -50,7 +52,7 @@ class Game:
                         print("Вы не можете сходить этой картой. Выберите другую или возьмите новую")
                         self.player_make_choose()
 
-                    if self.player.card is not None:
+                    if self.player.card is not NoneCard:
                         self.player.hand.remove(self.player.card)
 
                         if type(self.player.card) is WildCard:
@@ -77,7 +79,7 @@ class Game:
                     elif self.player.choose == "stop":
                         print("Вы остановили игру.")
 
-                    if not (self.player.is_blocked() or self.opponent.is_blocked()):
+                    if not (self.player.is_blocked(self.opponent) or self.opponent.is_blocked(self.player)):
                         print("")
 
                 if not self.opponent.is_blocked(self.player): # Ход противника
@@ -91,7 +93,7 @@ class Game:
                             print("Противник не смог отбить вашу карту.")
                             self.deck.draw(self.deck.buff_sum, self.opponent.hand)
 
-                        self.opponent.make_choose()
+                        self.opponent.make_choose(self.player.hand, self.deck.last_card)
                         if self.opponent.choose == "+":
                             self.deck.draw(1, self.opponent.hand)
                             self.opponent.make_choose
@@ -137,9 +139,9 @@ class Game:
 
         while not good_attempt:
             if self.player.choose == "+" and not self.player.try_play:
-                self.deck.draw(1, self.player.hand)
+                self.deck.draw(1, self.player.hand, show=True)
                 self.player.try_play = True
-                print("Если у вас появилась подходящая карта вы моежете ей сходить")
+                print("Если у вас появилась подходящая карта вы можете ей сходить")
                 print('Если нет нажмите enter для пропуска, или "+", чтобы при этом взять ещё 1 карту')
                 self.player_make_choose()
 
@@ -149,11 +151,14 @@ class Game:
 
             elif self.player.choose == "" and self.player.try_play:
                 good_attempt = True
-                self.player.card = None
+                self.player.card = Card(None)
 
             elif self.player.choose == "":
                 print("Некорректный ввод")
                 self.player_make_choose()
+
+            elif self.player.choose == "stop":
+                self.deck
 
             else:
                 self.player.card = self.player.hand[self.player.choose]

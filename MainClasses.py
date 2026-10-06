@@ -5,9 +5,9 @@ import random
 
 class RealPlayer(Player):        
     def make_choose(self) -> None:
-        print("Ваш набор карт:\n" + self.hand)
+        print("Ваш набор карт:\n" + str(self.hand))
         print('Выберите карту для хода. Если подходящей нет введите "+"')
-        player_choose = card_choose(input("Ваш выбор: "))
+        player_choose = card_choose(input("Ваш выбор: "), self.hand)
         self.choose = player_choose
 
     def choose_card(self, ind: int) -> Card:
@@ -32,10 +32,10 @@ class RealPlayer(Player):
         self.hand = self.swipe_hand
 
 class BotPlayer(Player):
-    def make_choose(self, player: RealPlayer, last_card: Card) -> None:
+    def make_choose(self, player_hand: CardPul, last_card: Card) -> None:
         choose = False
 
-        if len(player.hand) <= 3:
+        if len(player_hand) <= 3:
             for el in self.hand:
                 if el.value == "+2" and el.cpo(last_card):
                     self.card = el

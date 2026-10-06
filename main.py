@@ -37,6 +37,13 @@ while running:
         menu_choose = input("Выберите действие: ")
     menu_choose = MENU_CHOOSE[int(menu_choose) - 1]
 
+    if menu_choose == "fast_restart" and last_parameter is not None:
+        print("")
+        print("Выбран быстрый перезапуск")
+        print("Режим игры:", gamemode)
+        print("Сложность:", difficult)
+        print("Размер стартовой колоды:", SizeOfStartPul)
+
     if menu_choose == "fast_restart" and last_parameter is None:
         print("")
         print("Быстрый перезапуск невозможен, т.к. вы ещё не сыграли ни одной игры")
